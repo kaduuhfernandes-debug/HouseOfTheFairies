@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Home Of The Fairies</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --c1:#2d4354; --c2:#73766a; --c3:#fed7a5;
+      --c4:#9e6752; --c5:#534145; --c6:#20212b;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Poppins;background:var(--c6);color:var(--c3)}
+
+    header{padding:20px 40px;display:flex;justify-content:space-between;align-items:center;
+      background:linear-gradient(135deg,var(--c1),var(--c5))}
+    nav a{margin-left:20px;color:var(--c3);cursor:pointer;text-decoration:none}
+
+    section{display:none;padding:60px 40px}
+    section.active{display:block}
+
+    .hero{display:grid;grid-template-columns:1.2fr 1fr;gap:40px}
+    .hero img{max-width:100%;border-radius:24px}
+
+    .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:24px}
+    .card{background:linear-gradient(160deg,var(--c1),var(--c5));
+      border-radius:20px;padding:24px}
+
+    form{max-width:520px;background:linear-gradient(160deg,var(--c1),var(--c5));
+      padding:32px;border-radius:24px}
+    input,textarea,select{width:100%;padding:14px;margin-bottom:14px;border-radius:14px;border:none}
+    button{padding:14px;border:none;border-radius:20px;background:var(--c3);cursor:pointer}
+
+    footer{text-align:center;padding:30px;color:var(--c2)}
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>Home Of The Fairies</h1>
+  <nav>
+    <a onclick="showPage('home')">Home</a>
+    <a onclick="showPage('games')">Jogos</a>
+    <a onclick="showPage('feedback')">Feedback</a>
+    <a onclick="showPage('about')">Sobre</a>
+    <a onclick="showPage('login')">Login</a>
+  </nav>
+</header>
+
+<section id="home" class="active">
+  <div class="hero">
+    <div>
+      <h2>Bem-vindo ao mundo de Home Of The Fairies</h2>
+      <p>Teste meus jogos feitos na Godot 4 e envie feedbacks.</p>
+    </div>
+    <img src="https://via.placeholder.com/420x520">
+  </div>
+</section>
+
+<section id="games">
+  <h2>Jogos Publicados</h2>
+  <div class="cards">
+    <div class="card">
+      <h3>Home Of The Fairies</h3>
+      <p>📅 12/03/2025</p>
+      <p>📦 250 MB</p>
+      <p>⏳ Até 12/06/2025</p>
+    </div>
+  </div>
+</section>
+
+<section id="feedback">
+  <h2>Feedback</h2>
+  <form onsubmit="sendFeedback(); return false;">
+    <select id="exp">
+      <option>Excelente</option>
+      <option>Boa</option>
+      <option>Regular</option>
+      <option>Ruim</option>
+    </select>
+    <textarea id="bug" placeholder="Bug encontrado"></textarea>
+    <textarea id="sug" placeholder="Sugestões"></textarea>
+    <button>Enviar Feedback</button>
+  </form>
+</section>
+
+<section id="about">
+  <h2>Sobre</h2>
+  <div class="card">
+    <p>🎮 Desenvolvedor indie</p>
+    <p>🛠️ Godot 4</p>
+    <p>✨ Fantasia & aventura</p>
+  </div>
+</section>
+
+<section id="login">
+  <h2>Login / Cadastro</h2>
+  <form>
+    <input id="logEmail" type="email" placeholder="Email">
+    <input id="logPass" type="password" placeholder="Senha">
+    <button type="button" onclick="login()">Entrar</button>
+
+    <hr>
+
+    <input id="regEmail" type="email" placeholder="Novo email">
+    <input id="regPass" type="password" placeholder="Nova senha">
+    <button type="button" onclick="register()">Criar Conta</button>
+  </form>
+</section>
+
+<footer>© 2025 Home Of The Fairies</footer>
+
+<!-- 🔥 SCRIPT FIREBASE -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword }
+    from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  import { getFirestore, collection, addDoc, serverTimestamp }
+    from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCH3Hq3o0fyASsYHfYic-opVqVmVqcEboc",
+    authDomain: "home-of-the-fairies.firebaseapp.com",
+    projectId: "home-of-the-fairies",
+    storageBucket: "home-of-the-fairies.firebasestorage.app",
+    messagingSenderId: "706421179464",
+    appId: "1:706421179464:web:d974cfcc99301d599c047d"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  window.showPage = id => {
+    document.querySelectorAll("section").forEach(s=>s.classList.remove("active"));
+    document.getElementById(id).classList.add("active");
+  };
+
+  window.register = async () =>
+    createUserWithEmailAndPassword(auth,
+      regEmail.value, regPass.value).then(()=>alert("Conta criada"));
+
+  window.login = async () =>
+    signInWithEmailAndPassword(auth,
+      logEmail.value, logPass.value).then(()=>alert("Login ok"));
+
+  window.sendFeedback = async () =>
+    addDoc(collection(db,"feedbacks"),{
+      experiencia:exp.value, bugs:bug.value,
+      sugestoes:sug.value, createdAt:serverTimestamp()
+    }).then(()=>alert("Feedback enviado"));
+</script>
+
+</body>
+</html>
